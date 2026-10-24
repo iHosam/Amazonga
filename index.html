@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amazonga — Global Amazon Search Engine (23 Marketplaces)</title>
+  <meta name="description" content="Amazonga is a unified global search engine for all 23 Amazon versions worldwide (US, UK, JP, DE, SA, EG, FR, AE, IT, ES, CA, and more) with live currency conversion, ASIN lookup, and smart filters." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-glow bg-glow-1" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-2" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./" class="brand" aria-label="Amazonga Home">
+        <img src="favicon.svg" alt="" class="brand-logo" width="40" height="40" />
+        <div class="brand-text">
+          <span class="brand-name">Amazon<span class="brand-accent">ga</span></span>
+          <span class="brand-tagline">Global Multi-Marketplace Search Engine</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <div class="currency-selector-wrap" title="Base currency for live exchange rates & price filters">
+          <label for="baseCurrencySelect" class="sr-only">Base Currency</label>
+          <span class="currency-icon">💱</span>
+          <select id="baseCurrencySelect" class="select-pill">
+            <option value="USD">USD ($)</option>
+            <option value="SAR">SAR (﷼)</option>
+            <option value="EGP">EGP (E£)</option>
+            <option value="AED">AED (د.إ)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="JPY">JPY (¥)</option>
+            <option value="CAD">CAD (C$)</option>
+            <option value="AUD">AUD (A$)</option>
+            <option value="INR">INR (₹)</option>
+            <option value="TRY">TRY (₺)</option>
+            <option value="PLN">PLN (zł)</option>
+            <option value="SEK">SEK (kr)</option>
+            <option value="SGD">SGD (S$)</option>
+            <option value="BRL">BRL (R$)</option>
+            <option value="MXN">MXN (Mex$)</option>
+            <option value="ZAR">ZAR (R)</option>
+          </select>
+        </div>
+
+        <button type="button" id="openCompareModalBtn" class="btn btn-secondary btn-sm">
+          <span>⚖️ Price Calculator</span>
+        </button>
+
+        <button type="button" id="themeToggleBtn" class="btn-icon" aria-label="Toggle color theme" title="Toggle Dark / Light Theme">
+          <span id="themeIcon">☀️</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <!-- Hero Search Section -->
+    <section class="hero-section">
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        <span>23 Official Amazon Marketplaces • Live FX Rates • ASIN &amp; X-Ray Search</span>
+      </div>
+      <h1 class="hero-title">
+        Search Every <span class="gradient-text">Amazon Store</span> on Earth
+      </h1>
+      <p class="hero-subtitle">
+        Compare products across <strong>US, UK, JP, DE, SA, EG, FR, AE</strong> and 15+ more countries simultaneously with automatic local currency filters and English UI overrides.
+      </p>
+
+      <!-- Search Box Form -->
+      <form id="searchForm" class="search-box-wrap" autocomplete="off">
+        <div class="search-bar">
+          <div class="search-dept-wrap">
+            <label for="departmentSelect" class="sr-only">Department</label>
+            <select id="departmentSelect" class="dept-select" title="Filter by Amazon Department">
+              <option value="aps">All Departments</option>
+              <option value="electronics">Electronics</option>
+              <option value="computers">Computers &amp; Accessories</option>
+              <option value="videogames">Video Games</option>
+              <option value="mobile">Cell Phones &amp; Accessories</option>
+              <option value="kitchen">Home &amp; Kitchen</option>
+              <option value="fashion">Fashion &amp; Apparel</option>
+              <option value="stripbooks">Books</option>
+              <option value="toys-and-games">Toys &amp; Games</option>
+              <option value="beauty">Beauty &amp; Personal Care</option>
+              <option value="sporting">Sports &amp; Outdoors</option>
+              <option value="automotive">Automotive</option>
+              <option value="Tools">Tools &amp; Home Improvement</option>
+              <option value="baby-products">Baby</option>
+              <option value="pets">Pet Supplies</option>
+              <option value="office-products">Office Products</option>
+            </select>
+          </div>
+
+          <div class="search-input-container">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search products (e.g. Sony WH-1000XM5, RTX 5080, Kindle) or paste an ASIN / Amazon URL..."
+              aria-label="Search query, ASIN, or Amazon URL"
+              autofocus
+            />
+            <button type="button" id="clearSearchBtn" class="clear-btn hidden" aria-label="Clear search">✕</button>
+            <div id="autocompleteDropdown" class="autocomplete-dropdown hidden" role="listbox"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary search-submit-btn">
+            <span>🔍 Search All</span>
+          </button>
+        </div>
+
+        <!-- Detected ASIN / URL Smart Banner -->
+        <div id="asinDetectedBanner" class="asin-banner hidden">
+          <div class="asin-banner-left">
+            <span class="asin-badge">🎯 ASIN Detected</span>
+            <code id="detectedAsinCode" class="asin-code">B09XS7JWHH</code>
+            <span id="detectedSourceDomain" class="asin-source"></span>
+          </div>
+          <div class="asin-banner-actions">
+            <label class="toggle-chip">
+              <input type="checkbox" id="directAsinModeCheckbox" checked />
+              <span>Open Direct Product Page (<code>/dp/ASIN</code>)</span>
+            </label>
+            <a id="keepaLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline">📈 Keepa History</a>
+            <a id="camelLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline">🐪 CamelCamelCamel</a>
+          </div>
+        </div>
+
+        <!-- Advanced Filters Bar -->
+        <div class="filters-bar">
+          <div class="filter-group">
+            <label for="sortSelect" class="filter-label">Sort by:</label>
+            <select id="sortSelect" class="filter-select">
+              <option value="relevanceblender">Featured (Relevance)</option>
+              <option value="price-asc-rank">Price: Low to High</option>
+              <option value="price-desc-rank">Price: High to Low</option>
+              <option value="review-rank">Avg. Customer Review</option>
+              <option value="date-desc-rank">Newest Arrivals</option>
+            </select>
+          </div>
+
+          <div class="filter-group price-filter-group">
+            <span class="filter-label">Price (<span id="priceCurrencyLabel">USD</span>):</span>
+            <input type="number" id="minPriceInput" class="price-input" placeholder="Min" min="0" step="any" />
+            <span class="price-sep">–</span>
+            <input type="number" id="maxPriceInput" class="price-input" placeholder="Max" min="0" step="any" />
+            <span class="filter-hint" title="Automatically converted to each store's local currency in the Amazon search link!">⚡ Auto-converts</span>
+          </div>
+
+          <div class="filter-toggles">
+            <label class="toggle-chip" title="Force English UI across non-English Amazon stores (DE, JP, SA, EG, FR, ES, etc.)">
+              <input type="checkbox" id="forceEnglishCheckbox" checked />
+              <span>🌐 Force English UI</span>
+            </label>
+
+            <label class="toggle-chip" title="Filter for items with 4+ star customer ratings">
+              <input type="checkbox" id="fourStarCheckbox" />
+              <span>⭐ 4★ &amp; Up</span>
+            </label>
+
+            <label class="toggle-chip" title="Append discount/deal filter to search queries">
+              <input type="checkbox" id="dealsOnlyCheckbox" />
+              <span>🏷️ Deals / Discounts</span>
+            </label>
+          </div>
+        </div>
+      </form>
+
+      <!-- Trending / Quick Search Chips & Recent History -->
+      <div class="quick-chips-row">
+        <span class="chips-label">Popular:</span>
+        <button type="button" class="query-chip" data-query="Sony WH-1000XM5">🎧 Sony WH-1000XM5</button>
+        <button type="button" class="query-chip" data-query="MacBook Air M3">💻 MacBook Air M3</button>
+        <button type="button" class="query-chip" data-query="PlayStation 5 Pro">🎮 PlayStation 5 Pro</button>
+        <button type="button" class="query-chip" data-query="Kindle Paperwhite">📖 Kindle Paperwhite</button>
+        <button type="button" class="query-chip" data-query="Casio G-Shock">⌚ Casio G-Shock</button>
+        <button type="button" class="query-chip" data-query="B09XS7JWHH">🔢 Sample ASIN (B09XS7JWHH)</button>
+      </div>
+
+      <div id="recentSearchesRow" class="quick-chips-row hidden">
+        <span class="chips-label">Recent:</span>
+        <div id="recentSearchesList" class="recent-list"></div>
+        <button type="button" id="clearHistoryBtn" class="btn-link-sm">Clear</button>
+      </div>
+    </section>
+
+    <!-- Region Tabs & Multi-Launch Toolbar -->
+    <section class="controls-section">
+      <div class="region-tabs" role="tablist" aria-label="Marketplace Regions">
+        <button type="button" class="region-tab active" data-region="all">🌍 All Stores <span class="tab-count">23</span></button>
+        <button type="button" class="region-tab" data-region="core">⭐ Featured (US/UK/JP/DE/SA/EG/FR) <span class="tab-count">7</span></button>
+        <button type="button" class="region-tab" data-region="pinned">📌 My Pinned <span id="pinnedCountBadge" class="tab-count">7</span></button>
+        <button type="button" class="region-tab" data-region="mea">🐪 Middle East &amp; Africa <span class="tab-count">4</span></button>
+        <button type="button" class="region-tab" data-region="americas">🌎 Americas <span class="tab-count">4</span></button>
+        <button type="button" class="region-tab" data-region="europe">🇪🇺 Europe <span class="tab-count">11</span></button>
+        <button type="button" class="region-tab" data-region="apac">🌏 Asia-Pacific <span class="tab-count">4</span></button>
+      </div>
+
+      <div class="batch-toolbar">
+        <div class="batch-left">
+          <div class="country-filter-wrap">
+            <input type="text" id="countrySearchInput" class="country-filter-input" placeholder="Filter country or domain (e.g. SA, Egypt, .jp)..." />
+          </div>
+          <button type="button" id="selectCoreBtn" class="btn btn-xs btn-outline" title="Select US, UK, JP, DE, SA, EG, FR">Select Core 7</button>
+          <button type="button" id="selectAllVisibleBtn" class="btn btn-xs btn-outline">Select Visible</button>
+          <button type="button" id="deselectAllBtn" class="btn btn-xs btn-outline">Clear Selection</button>
+        </div>
+
+        <div class="batch-right">
+          <span id="fxStatusBadge" class="fx-status" title="Live currency exchange rates status">🔄 Loading live FX rates...</span>
+          <button type="button" id="launchSelectedBtn" class="btn btn-accent">
+            <span>🚀 Open Selected (<span id="selectedCountLabel">7</span>) Tabs</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marketplaces Grid -->
+    <section aria-label="Amazon Marketplaces">
+      <div id="marketplacesGrid" class="marketplaces-grid"></div>
+    </section>
+
+    <!-- Global X-Ray Meta Search Section -->
+    <section class="xray-section card-panel">
+      <div class="xray-header">
+        <div>
+          <h2 class="section-title">🛰️ Global Web X-Ray Search Across All Amazon Domains</h2>
+          <p class="section-desc">
+            Search product pages, reviews, and indexed listings across multiple Amazon country domains at once using external search engines.
+          </p>
+        </div>
+        <div class="xray-buttons">
+          <a id="globalGoogleXrayBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <span>🔎 Google Multi-Amazon X-Ray</span>
+          </a>
+          <a id="globalDdgXrayBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <span>🦆 DuckDuckGo Multi-Amazon X-Ray</span>
+          </a>
+          <a id="globalBingXrayBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <span>🌐 Bing Multi-Amazon X-Ray</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Cross-Border Price & Currency Comparison Modal -->
+  <div id="compareModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="compareModalTitle" class="modal-title">⚖️ Cross-Border Amazon Price Comparator</h2>
+          <p class="modal-subtitle">Enter prices you found on different Amazon stores to see which country offers the lowest price in your base currency.</p>
+        </div>
+        <button type="button" id="closeCompareModalBtn" class="btn-icon" aria-label="Close modal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="compare-controls">
+          <label for="compareShippingInput" class="filter-label">Default Est. International Shipping (in base currency):</label>
+          <input type="number" id="compareShippingInput" class="price-input" value="0" min="0" step="any" />
+          <button type="button" id="resetComparatorBtn" class="btn btn-xs btn-outline">Reset Prices</button>
+        </div>
+        <div id="comparatorTableWrap" class="comparator-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Amazonga</strong> — Open-Source Global Amazon Search Engine across 23 international marketplaces.
+      </div>
+      <div class="footer-links">
+        <span>Supports US, UK, JP, DE, SA, EG, FR, AE, IT, ES, CA, AU, IN, NL, SE, PL, TR, SG, MX, BR, BE, IE, ZA</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -350,7 +350,8 @@ const state = {
     JSON.parse(localStorage.getItem('amazonga_pinned') || '["US","UK","DE","JP","SA","EG","FR"]')
   ),
   recentSearches: JSON.parse(localStorage.getItem('amazonga_recent') || '[]'),
-  comparatorInputs: {}
+  comparatorInputs: {},
+  pendingQueueStores: []
 };
 
 // DOM References
@@ -398,6 +399,13 @@ const dom = {
   compareShippingInput: document.getElementById('compareShippingInput'),
   resetComparatorBtn: document.getElementById('resetComparatorBtn'),
   comparatorTableWrap: document.getElementById('comparatorTableWrap'),
+  launchQueueModal: document.getElementById('launchQueueModal'),
+  closeQueueModalBtn: document.getElementById('closeQueueModalBtn'),
+  queueRemainingCount: document.getElementById('queueRemainingCount'),
+  openNextQueueBtn: document.getElementById('openNextQueueBtn'),
+  nextStoreNameLabel: document.getElementById('nextStoreNameLabel'),
+  retryAllQueueBtn: document.getElementById('retryAllQueueBtn'),
+  queueStoresList: document.getElementById('queueStoresList'),
   toastContainer: document.getElementById('toastContainer')
 };
 
@@ -943,18 +951,80 @@ function launchSelectedStores() {
     recordSearchHistory(state.query.trim());
   }
 
-  let blockedCount = 0;
-  selectedList.forEach(store => {
+  launchStoreList(selectedList);
+}
+
+function launchStoreList(storesToLaunch) {
+  const blockedStores = [];
+  let openedCount = 0;
+
+  storesToLaunch.forEach(store => {
     const url = buildStoreUrl(store);
-    const win = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!win) blockedCount++;
+    // Important: Do NOT pass 'noopener,noreferrer' in windowFeatures because
+    // HTML spec forces window.open() to return null when noopener is specified,
+    // AND restricts multi-window creation. Instead, null out win.opener manually.
+    const win = window.open(url, '_blank');
+    if (win) {
+      try {
+        win.opener = null;
+      } catch (_) {}
+      openedCount++;
+    } else {
+      blockedStores.push(store);
+    }
   });
 
-  if (blockedCount > 0) {
-    showToast(`⚠️ Browser blocked ${blockedCount} tab(s). Allow pop-ups for Amazonga in your address bar to open multiple Amazon stores at once!`);
+  state.pendingQueueStores = blockedStores;
+
+  if (blockedStores.length > 0) {
+    renderLaunchQueueModal();
+    dom.launchQueueModal.classList.remove('hidden');
+    setTimeout(() => dom.openNextQueueBtn.focus(), 60);
   } else {
-    showToast(`🚀 Opened ${selectedList.length} Amazon store(s)!`);
+    dom.launchQueueModal.classList.add('hidden');
+    showToast(`🚀 Opened all ${openedCount} Amazon store(s)!`);
   }
+}
+
+function renderLaunchQueueModal() {
+  const remaining = state.pendingQueueStores;
+  if (!remaining.length) {
+    dom.launchQueueModal.classList.add('hidden');
+    showToast('🎉 All selected Amazon stores have been opened!');
+    return;
+  }
+
+  dom.queueRemainingCount.textContent = remaining.length;
+  const nextStore = remaining[0];
+  dom.nextStoreNameLabel.textContent = `${nextStore.flag} ${nextStore.country} (${nextStore.code})`;
+
+  dom.queueStoresList.innerHTML = '';
+  remaining.forEach(store => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'queue-store-btn';
+    btn.innerHTML = `
+      <span>${store.flag} ${store.country} (${store.code})</span>
+      <span>↗</span>
+    `;
+    btn.addEventListener('click', () => {
+      const url = buildStoreUrl(store);
+      const win = window.open(url, '_blank');
+      if (win) {
+        try { win.opener = null; } catch (_) {}
+      }
+      state.pendingQueueStores = state.pendingQueueStores.filter(s => s.code !== store.code);
+      renderLaunchQueueModal();
+    });
+    dom.queueStoresList.appendChild(btn);
+  });
+}
+
+function openNextQueuedStore() {
+  if (!state.pendingQueueStores.length) return;
+  // Try opening all remaining in case the user just enabled pop-ups;
+  // otherwise at least the first one in the queue will open with this click gesture!
+  launchStoreList([...state.pendingQueueStores]);
 }
 
 /**
@@ -1171,6 +1241,20 @@ function initEvents() {
   dom.resetComparatorBtn.addEventListener('click', () => {
     state.comparatorInputs = {};
     renderComparator();
+  });
+
+  // Multi-Store Launch Queue Modal
+  dom.openNextQueueBtn.addEventListener('click', openNextQueuedStore);
+  dom.retryAllQueueBtn.addEventListener('click', openNextQueuedStore);
+
+  dom.closeQueueModalBtn.addEventListener('click', () => {
+    dom.launchQueueModal.classList.add('hidden');
+  });
+
+  dom.launchQueueModal.addEventListener('click', e => {
+    if (e.target === dom.launchQueueModal) {
+      dom.launchQueueModal.classList.add('hidden');
+    }
   });
 
   // Check URL query parameter (?q=...)

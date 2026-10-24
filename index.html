@@ -275,6 +275,44 @@
     </div>
   </div>
 
+  <!-- Multi-Tab Launch Queue / Pop-up Unblocker Modal -->
+  <div id="launchQueueModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="launchQueueTitle">
+    <div class="modal-card launch-queue-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="launchQueueTitle" class="modal-title">🚀 Multi-Store Tab Launcher (<span id="queueRemainingCount">0</span> Remaining)</h2>
+          <p class="modal-subtitle">
+            Your browser opened the first store and paused the remaining tabs to prevent unwanted pop-ups.
+          </p>
+        </div>
+        <button type="button" id="closeQueueModalBtn" class="btn-icon" aria-label="Close modal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="popup-tip-box">
+          <div class="popup-tip-title">💡 Enable True 1-Click Multi-Tab Opening (One-Time Setup):</div>
+          <ol class="popup-tip-steps">
+            <li>Look at the right side of your browser's address bar for the <strong>Pop-up blocked</strong> icon <code>[↗✕]</code>.</li>
+            <li>Select <strong>"Always allow pop-ups and redirects from https://ihosam.github.io"</strong> and click <strong>Done</strong>.</li>
+            <li>Once enabled, clicking <strong>Open Selected Tabs</strong> will open all selected Amazon stores simultaneously in one click!</li>
+          </ol>
+        </div>
+
+        <div class="queue-rapid-box">
+          <button type="button" id="openNextQueueBtn" class="btn btn-primary btn-lg queue-next-btn">
+            <span>⚡ Open Next Store (<span id="nextStoreNameLabel">UK</span>) — or press Space / Enter</span>
+          </button>
+          <button type="button" id="retryAllQueueBtn" class="btn btn-secondary">
+            <span>🔄 Retry All At Once (after allowing pop-ups)</span>
+          </button>
+        </div>
+
+        <div class="queue-list-header">Remaining Selected Stores (click any to open):</div>
+        <div id="queueStoresList" class="queue-stores-grid"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 

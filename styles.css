@@ -1085,6 +1085,83 @@ body {
   justify-content: space-between;
 }
 
+/* Multi-Store Launch Queue Modal */
+.launch-queue-card {
+  max-width: 680px;
+}
+
+.popup-tip-box {
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 153, 0, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.1rem;
+}
+
+.popup-tip-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 0.45rem;
+}
+
+.popup-tip-steps {
+  padding-left: 1.25rem;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.queue-rapid-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.15rem;
+}
+
+.queue-next-btn {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+  font-size: 1rem;
+}
+
+.queue-list-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.55rem;
+}
+
+.queue-stores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 0.55rem;
+}
+
+.queue-store-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.queue-store-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
 /* Toast */
 .toast-container {
   position: fixed;
